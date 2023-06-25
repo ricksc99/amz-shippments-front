@@ -6,7 +6,7 @@ import { ChakraProvider, CSSReset, Flex, GridItem } from '@chakra-ui/react';
 import Dashboard from '../pages/dashboard/Dashboard';
 
 import theme from '../theme';
-import { Sidebar } from '../components/general/sidebar';
+import { Sidebar } from '../components/general/Sidebar';
 import { Login } from '../pages/login/Login';
 import { PrivateRoute } from './PrivateRoute';
 import { Suppliers } from '../pages/suppliers/Suppliers';
