@@ -1,23 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import { TabIndicator, useBreakpointValue, useToast, Spinner, Editable, EditablePreview, EditableInput, Tabs, TabList, Tab, TabPanels, TabPanel, Stack, Select, NumberInput, NumberInputField, Modal, ModalContent, ModalFooter, ModalBody, FormControl, FormLabel, ModalCloseButton, ModalHeader, ModalOverlay, InputGroup, InputLeftElement, Input, Icon, Avatar, Table, Thead, Tr, Th, Td, Tbody, Box, Link, Button, Flex, Text, Grid, Divider } from '@chakra-ui/react';
-import { BsPlusLg, BsSearch, BsBoxArrowInUpRight, BsTelephone, BsEnvelope } from "react-icons/bs";
+import { BsDownload, BsXLg, BsPlusLg, BsSearch, BsBoxArrowInUpRight, BsTelephone, BsEnvelope, BsTrash3 } from "react-icons/bs";
 import { ChevronDownIcon, ChevronUpIcon, EmailIcon, PhoneIcon } from "@chakra-ui/icons";
 import * as SuppliersService from "../../services/SuppliersService";
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
+import { AlertDialogCustom } from '../../components/general/AlertDialogCustom';
+import { SupplierDetails } from './SupplierDetails';
+import { NotResults } from '../../components/general/NotResults';
 
 export function Suppliers () {
     const isMobile = useBreakpointValue({ base: true, md: false });
     const [suppliersIsLoading, setSuppliersIsLoading] = useState(false);
-    const [suppliersData, setSuppliersData] = useState(false);
     const [filter, setFilter] = useState({});
     const [supplierDetails, setSupplierDetails] = useState({});
     const [isOpen, setIsOpen] = useState(false);
-    const [loadSave, setLoadSave] = useState(false);
     const toast = useToast()
     const [data, setData] = useState([]);
     const [modalIsLoading, setModalIsLoading] = useState(false);
     const [invalidFields, setInvalidFields] = useState([]);
+    const [notExistResults, setNotExistResults] = useState(false);
     
     const columns = [
       { name: "Nombre", field: 'contact_name' },
@@ -70,9 +72,13 @@ export function Suppliers () {
     const fetchSuppliers = async () => {
       try {
         setSuppliersIsLoading(true);
+        setNotExistResults(false);
         const response = await SuppliersService.getAllSuppliers("id,contact_name,contact_email,contact_phone,name,full_address");
         setData(response.data);
         setSuppliersIsLoading(false);
+        if (response.data.length == 0) {
+          setNotExistResults(true);
+        }
       } catch (error) {
         setSuppliersIsLoading(false);
         console.error('Error fetching orders:', error);
@@ -111,49 +117,6 @@ export function Suppliers () {
       setSupplierDetails({});
     };
 
-    const handleChangeSupplierDetails = (e, type, index) => {
-        setSupplierDetails({ ...supplierDetails, [e.target.name]: e.target.value });
-    };
-
-    const saveSupplier = async () => {
-      try {
-
-        const invalidFields = [];
-        // Validar campos requeridos
-        if (!supplierDetails.contact_name) {
-          invalidFields.push('contact_name');
-        }
-        if (!supplierDetails.name) {
-          invalidFields.push('name');
-        }
-
-        if (invalidFields.length > 0) {
-          setInvalidFields(invalidFields);
-          toast({ title: 'Error.', description: "Rellena los campos obligatorios.", status: 'error', duration: 3000, isClosable: true })
-          return;
-        } else {
-          setInvalidFields([]);
-        }
-        setLoadSave(true);
-        const response = supplierDetails.id != null ? await SuppliersService.saveSupplier(supplierDetails) : await SuppliersService.createSupplier(supplierDetails);
-        
-        if (response.data != null) {
-          setSupplierDetails({});
-          setLoadSave(false);
-          setIsOpen(false);
-          toast({ title: 'Guardado.', description: "Se ha guardado el proveedor correctamente.", status: 'success', duration: 5000, isClosable: true });
-          fetchSuppliers();
-        } else {
-          setLoadSave(false);
-          toast({ title: 'Error.', description: `${response.code}: ${response.error}`, status: 'error', duration: 5000, isClosable: true })
-        }
-      } catch (error) {
-        setLoadSave(false);
-        setIsOpen(false);
-        toast({ title: 'Error.', description: "Ha ocurrido un error al guardar el proveedor. Inténtalo de nuevo más tarde.", status: 'error', duration: 5000, isClosable: true })
-      }
-    }
-
     return (
         <Grid bg="#fff" borderRadius="xl">
           <Divider orientation='horizontal'/>
@@ -176,7 +139,7 @@ export function Suppliers () {
             </Grid>
           </Flex>
           <Divider orientation='horizontal'/>
-          { !suppliersIsLoading &&
+          { !suppliersIsLoading && !notExistResults &&
             <Grid overflow={"auto"}>
               <Table variant="simple">
                 <Thead>
@@ -241,86 +204,20 @@ export function Suppliers () {
             </Flex>
           }
 
-          <Modal isOpen={isOpen} size={"2xl"} onClose={handleClose}>
-            <ModalOverlay />
-            <ModalContent>
-            <ModalHeader>Proveedor</ModalHeader>
-            <ModalCloseButton />
-            { !modalIsLoading && <>
-              <ModalBody>
-                <Tabs colorScheme='primary'>
-                    <TabList overflowX="auto" overflowY="hidden">
-                        <Tab fontSize={['xs', 'md']} border="0">Detalles</Tab>
-                        <Tab fontSize={['xs', 'md']} border="0">Información pago</Tab>
-                        <Tab fontSize={['xs', 'md']} border="0">Productos</Tab>
-                        <Tab fontSize={['xs', 'md']} border="0">Pedidos</Tab>
-                    </TabList>
-                    { !isMobile && <TabIndicator mt="-1.5px" height="2px" bg="primary.500" borderRadius="1px"/>}
-                    <TabPanels>
-                        <TabPanel>
-                            <Stack direction="row" spacing={3} mb={3}>
-                                <FormControl isRequired flex={1} mb={3}>
-                                    <FormLabel>Nombre de contacto</FormLabel>
-                                    <Input borderColor={invalidFields.includes('contact_name') ? 'red' : null} variant="filled" value={supplierDetails.contact_name} name="contact_name" onChange={handleChangeSupplierDetails} placeholder="Ingrese el nombre del contacto" />
-                                </FormControl>
-                            </Stack>
-                            <Stack direction="row" spacing={3} mb={3}>
-                                <FormControl flex={1} mb={3}>
-                                    <FormLabel>Email de contacto</FormLabel>
-                                    <Input variant="filled" value={supplierDetails.contact_email} name="contact_email" onChange={handleChangeSupplierDetails} type="email" placeholder="E-mail" />
-                                </FormControl>
-                                <FormControl flex={1} mb={3}>
-                                    <FormLabel>Teléfono de contacto</FormLabel>
-                                    <Input variant="filled" value={supplierDetails.contact_phone} name="contact_phone" onChange={handleChangeSupplierDetails} type="tel" placeholder="Teléfono" />
-                                </FormControl>
-                            </Stack>
-                            <Stack direction="row" spacing={3} mb={3}>
-                                <FormControl isRequired flex={1} mb={3}>
-                                    <FormLabel>Nombre de la empresa</FormLabel>
-                                    <Input borderColor={invalidFields.includes('name') ? 'red' : null} variant="filled" value={supplierDetails.name} name="name" onChange={handleChangeSupplierDetails} placeholder="Ingrese el nombre de la empresa" />
-                                </FormControl>
-                            </Stack>
-                            <Stack direction="row" spacing={3} mb={3}>
-                                <FormControl flex={1} mb={3}>
-                                    <FormLabel>URL de la empresa</FormLabel>
-                                    <Input variant="filled" value={supplierDetails.website} name="website" onChange={handleChangeSupplierDetails} placeholder="Ingrese la URL de la empresa" />
-                                </FormControl>
-                            </Stack>
-                            <Stack direction="row" spacing={3} mb={3}>
-                                <FormControl flex={1} mb={3}>
-                                    <FormLabel>Dirección de la empresa</FormLabel>
-                                    <Input variant="filled" value={supplierDetails.full_address} name="full_address" onChange={handleChangeSupplierDetails} placeholder="Ingrese la dirección de la empresa" />
-                                </FormControl>
-                            </Stack>
+          { notExistResults &&
+            <NotResults addCallback={addSupplier} />
+          }
 
-                        </TabPanel>
-                        <TabPanel>
-                          TODO PAGO
-                        </TabPanel>
-                        <TabPanel>
-                          TODO PRODUCTOS
-                        </TabPanel>
-                        <TabPanel>
-                          TODO PEDIDOS
-                        </TabPanel>
-                    </TabPanels>
-                </Tabs>
-                  
-              </ModalBody>
-              <ModalFooter>
-                { loadSave && <Grid width="100%" alignItems="center" justifyContent="center"><Spinner thickness='4px' speed='0.65s' emptyColor='gray.200' color='primary.500' size='lg' mr={2}/></Grid>}
-                { !loadSave && <Button colorScheme="blue" mr={3} onClick={saveSupplier}>Guardar</Button>}
-                { !loadSave && <Button colorScheme="red" onClick={handleClose}>Cancelar</Button>}
-              </ModalFooter>
-            </>}
-
-            { modalIsLoading && 
-              <Flex alignItems="center" justifyContent="center" minH={250} w="100%">
-                <Spinner thickness='4px' speed='0.65s' emptyColor='gray.200' color='primary.500' size='lg' mr={2}/>
-              </Flex>
-            }
-            </ModalContent>
-          </Modal>
+          <SupplierDetails 
+            setIsOpen={setIsOpen} 
+            isOpen={isOpen} 
+            fetchSuppliers={fetchSuppliers} 
+            supplierDetails={supplierDetails} 
+            setSupplierDetails={setSupplierDetails} 
+            handleClose={handleClose}
+            invalidFields={invalidFields}
+            setInvalidFields={setInvalidFields}
+          />
         </Grid>
     );
   };

@@ -19,7 +19,7 @@ export async function getSupplierById(id) {
         const data = await response.json();
         return data;
     } catch (error) {
-        console.log(error);
+        throw new Error('Error fetching suppliers');
     }
 }
 
@@ -35,7 +35,7 @@ export async function createSupplier(obj) {
         const data = await response.json();
         return data;
     } catch (error) {
-        console.log(error);
+        throw new Error('Error fetching suppliers');
     }
 }
 
@@ -51,6 +51,18 @@ export async function saveSupplier(obj) {
         const data = await response.json();
         return data;
     } catch (error) {
-        console.log(error);
+        throw new Error('Error fetching suppliers');
+    }
+}
+
+export async function removeSupplier(id) {
+    try {
+        const response = await fetch(`${API_URL}/providers/${id}`, {
+            method: 'DELETE',
+          });
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        throw new Error('Error fetching suppliers');
     }
 }

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { BrowserRouter as Router, Link, useLocation } from 'react-router-dom';
-import { Image, Box, Flex, Icon, Text, Spacer, Divider, IconButton, Tooltip, Fade, useBreakpointValue } from '@chakra-ui/react';
+import { Grid, Image, Box, Flex, Icon, Text, Spacer, Divider, IconButton, Tooltip, Fade, useBreakpointValue } from '@chakra-ui/react';
 import { BiMenu, BiHomeAlt, BiBuildings, BiCube, BiCalendarEvent, BiLogOut, BiRightArrowAlt, BiLeftArrowAlt, BiExtension, BiIdCard, BiChat } from "react-icons/bi";
 import AmazonLogo from "../../assets/images/logo_amazon.png";
 import AmazonLogoXs from "../../assets/images/logo_amazon_xs.png";
@@ -11,7 +11,7 @@ const listMenu = [
       list: [
         { name: "Inicio", link: "/", icon: BiHomeAlt},
         { name: "Pedidos", link: "/orders", icon: BiCalendarEvent},
-        { name: "Productos", link: "/productos", icon: BiCube},
+        { name: "Productos", link: "/products", icon: BiCube},
         { name: "Proveedores", link: "/suppliers", icon: BiBuildings},
       ]
     },
@@ -26,14 +26,9 @@ const listMenu = [
 ];
   
   // Componente del menú lateral
-export function Sidebar ({ onLogout }) {
-    const [isSidebarOpen, setSidebarOpen] = useState(false);
+export function Sidebar ({ onLogout, isSidebarOpen, setSidebarOpen, handleSidebarToggle }) {
     const location = useLocation();
     let isMobile = useBreakpointValue({ base: true, md: false });
-
-    const handleSidebarToggle = () => {
-        setSidebarOpen(!isSidebarOpen);
-    };
 
     const isMenuActive = (path) => {
         return location.pathname === path;
@@ -130,21 +125,6 @@ export function Sidebar ({ onLogout }) {
                 </Box>
                 </Flex>
             </Box>
-            {(isMobile && !isSidebarOpen) &&
-                <Box position="absolute" bottom="2" left="2" zIndex="1">
-                    <IconButton
-                        icon={<BiMenu />}
-                        bg="primary.500"
-                        color="#fff"
-                        borderRadius="full"
-                        outline="none"
-                        fontSize="xl"
-                        _hover={{ bg: '#fff', color: "primary.500" }}
-                        onClick={handleSidebarToggle}
-                        // ...
-                    />
-                </Box>
-            }
         </>
     );
 };

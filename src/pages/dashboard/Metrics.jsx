@@ -34,7 +34,7 @@ export function Metrics () {
         <>
         <Flex flexWrap={"wrap"} mb="2">
           <Box w={"50%"}>
-            <Box bg="#fff" borderRadius="xl" p="4" m="2">
+            <Box bg="#fff" borderRadius="xl" p="4" m="2" boxShadow={["md", "none"]}>
               <Flex alignItems="center" justifyContent="space-between">
                 <Flex alignItems="center" justifyContent="flex-start">
                   <Grid bg="#7b8bff54" p={2} borderRadius="md">
@@ -66,7 +66,7 @@ export function Metrics () {
           </Box>
           
           <Box w={"50%"}>
-            <Box bg="#fff" borderRadius="xl" p="4" m="2">
+            <Box bg="#fff" borderRadius="xl" p="4" m="2" boxShadow={["md", "none"]}>
               <Flex alignItems="center" justifyContent="space-between">
                 <Flex alignItems="center" justifyContent="flex-start">
                   <Grid bg="#ffac7b54" p={2} borderRadius="md">
@@ -99,7 +99,7 @@ export function Metrics () {
           </Box>
           
           <Box w={"50%"}>
-            <Box bg="#fff" borderRadius="xl" p="4" m="2">
+            <Box bg="#fff" borderRadius="xl" p="4" m="2" boxShadow={["md", "none"]}>
               <Flex alignItems="center" justifyContent="space-between">
                 <Flex alignItems="center" justifyContent="flex-start">
                   <Grid bg="#ff404054" p={2} borderRadius="md">
@@ -128,7 +128,7 @@ export function Metrics () {
           </Box>
           
           <Box w={"50%"}>
-            <Box bg="#fff" borderRadius="xl" p="4" m="2">
+            <Box bg="#fff" borderRadius="xl" p="4" m="2" boxShadow={["md", "none"]}>
               <Flex alignItems="center" justifyContent="space-between">
                 <Flex alignItems="center" justifyContent="flex-start">
                   <Grid bg="#00932e54" p={2} borderRadius="md">

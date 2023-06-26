@@ -1,5 +1,15 @@
 import { extendTheme } from '@chakra-ui/react';
 
+const customSelectTheme = {
+  components: {
+    Select: {
+      baseStyle: {
+        fontSize: ["xs", "md"], // Tamaño de fuente personalizado
+      },
+    },
+  },
+};
+
 const theme = extendTheme({
   colors: {
     primary: {
@@ -51,6 +61,13 @@ const theme = extendTheme({
         },
       },
     },
+    Select: {
+      styles: {
+        control: {
+          fontSize: ["xs", "md"],
+        },
+      },
+    },
     FormLabel: {
       baseStyle: {
         fontSize: ["xs", "md"],
@@ -59,6 +76,7 @@ const theme = extendTheme({
     Tab: {
       fontSize: ["xs", "md"],
     },
+    ...customSelectTheme,
   },
 });
 

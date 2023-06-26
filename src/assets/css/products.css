@@ -1,0 +1,8 @@
+.select-autocomplete__control {
+    border-radius: var(--chakra-radii-md) !important;
+    border: 2px solid !important;
+    border-color: var(--chakra-colors-transparent) !important;
+    background: var(--chakra-colors-gray-100) !important;
+    outline: 2px solid transparent !important;
+    outline-offset: 2px !important;
+}
