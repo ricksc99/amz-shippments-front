@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, HashRouter } from 'react-router-dom';
 import { Grid, ChakraProvider, CSSReset, Flex, GridItem } from '@chakra-ui/react';
 
 // Importa los componentes de las diferentes páginas
@@ -47,7 +47,7 @@ const App = () => {
   return (
     <ChakraProvider theme={theme}>
       <CSSReset />
-      <Router>
+      <HashRouter basename="">
         { isLogged && !isSidebarOpen &&
           <Header onLogout={onLogout} handleSidebarToggle={handleSidebarToggle} />
         }
@@ -83,7 +83,7 @@ const App = () => {
             </Routes>
           </GridItem>
         </Flex>
-      </Router>
+      </HashRouter>
     </ChakraProvider>
   );
 };
