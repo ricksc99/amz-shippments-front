@@ -81,6 +81,7 @@ export function Suppliers () {
         }
       } catch (error) {
         setSuppliersIsLoading(false);
+        setNotExistResults(true);
         console.error('Error fetching orders:', error);
       }
     };

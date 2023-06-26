@@ -86,6 +86,7 @@ export function Products () {
             setNotExistProducts(true);
         }
       } catch (error) {
+        setNotExistProducts(true);
         setProductsIsLoading(false);
         console.error('Error fetching orders:', error);
       }
