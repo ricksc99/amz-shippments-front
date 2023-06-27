@@ -44,20 +44,26 @@ const App = () => {
     };
   }, []);
 
+  const closeSidebar = () => {
+    if (isMobile && isSidebarOpen) {
+      setSidebarOpen(!isSidebarOpen);
+    }
+  }
+
   return (
     <ChakraProvider theme={theme}>
       <CSSReset />
       <HashRouter basename="">
-        { isLogged && !isSidebarOpen &&
+        { isLogged &&
           <Header onLogout={onLogout} handleSidebarToggle={handleSidebarToggle} />
         }
-        <Flex height="100vh" width="100vw" marginTop={(isMobile && !isSidebarOpen) ? "40px" : "0px"}>
+        <Flex height="100vh" width="100vw" marginTop={(isMobile && isLogged) ? "50px" : "0px"}>
           { isLogged &&
             <GridItem>
               <Sidebar onLogout={onLogout} isSidebarOpen={isSidebarOpen} setSidebarOpen={setSidebarOpen} handleSidebarToggle={handleSidebarToggle} />
             </GridItem>
           }
-          <GridItem w="100%" overflow="auto" bg={["#fff", "#efefef"]} p={["0", "4"]}>
+          <GridItem pointerEvents={(isMobile && isSidebarOpen) ? "none" : ""} filter={(isMobile && isSidebarOpen) ? "brightness(0.6)" : ""} w="100%" overflow="auto" bg={["#fff", "#efefef"]} p={["0", "4"]}>
             <Routes>
               <Route exact path="/login" element={ isLogged ? <Dashboard isLogged={isLogged} setIsLogged={setIsLogged} /> : <Login setIsLogged={setIsLogged} />} />
               <Route exact path="/" element={

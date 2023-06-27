@@ -52,6 +52,7 @@ function isExpiredDate(date) {
 }
 
 export function Orders () {
+    const columnRefs = [useRef(null), useRef(null), useRef(null)];
     const isMobile = useBreakpointValue({ base: true, md: false });
     const [isOpen, setIsOpen] = useState(false);
     const [orderDetails, setOrderDetails] = useState({});
@@ -67,6 +68,10 @@ export function Orders () {
         index: 1,
         count: steps.length,
     })
+    const [scrollTimer, setScrollTimer] = useState(null);
+    const [scrollLeft, setScrollLeft] = useState(0);
+    const [actualColumnPosition, setActualColumnPosition] = useState(0);
+    const [handleScrollStarted, setHandleScrollStarted] = useState(false);
 
     useEffect(() => {
         const fetchOrders = async () => {
@@ -139,6 +144,61 @@ export function Orders () {
         // Realizar la actualización del orden de las tareas en función de los datos proporcionados
         // (puedes modificar los datos según tus necesidades)
     };
+    
+    const handleScroll = (event) => {
+        // if (!handleScrollStarted) {
+        //     setHandleScrollStarted(true);
+        //     clearTimeout(scrollTimer);
+        //     // Inicia un nuevo temporizador para detectar el final del scroll en móvil
+        //     const newScrollTimer = setTimeout(() => {
+        //         // Lógica adicional que deseas ejecutar cuando el scroll ha finalizado en móvil
+        //         const { scrollLeft: newScrollLeft } = event.target;
+            
+        //         // Calcula el ancho de cada columna (250px) y el punto de cambio
+        //         var columnsOrder = document.getElementsByClassName("columnOrder");
+        //         var columnWidth = 250;
+        //         if (columnsOrder && columnsOrder.length > 0) {
+        //             columnWidth = columnsOrder[0].clientWidth;
+        //         }
+        //         const breakpoint = columnWidth / 2;
+            
+        //         var newIndexColumn = -1;
+            
+        //         if (newScrollLeft > scrollLeft) {
+        //             // Scroll hacia la derecha
+        //             if (columnRefs[actualColumnPosition+1]) {
+        //                 newIndexColumn = actualColumnPosition+1;
+        //             } else {
+        //                 newIndexColumn = -1;
+        //             }
+        //         } else if (newScrollLeft < scrollLeft) {
+        //             // Scroll hacia la izquierda
+        //             if (columnRefs[actualColumnPosition-1]) {
+        //                 newIndexColumn = actualColumnPosition-1;
+        //             } else {
+        //                 newIndexColumn = -1;
+        //             }
+        //         }
+              
+        //         setScrollLeft(newScrollLeft);
+    
+        //         // Comprueba si el scroll se encuentra más cerca del punto de cambio
+        //         // en lugar de estar en el inicio de una columna
+        //         if (newIndexColumn > -1) {
+        //             columnRefs[newIndexColumn].current.scrollIntoView({
+        //                 behavior: 'smooth',
+        //                 block: 'start',
+        //                 inline: 'center',
+        //             });
+        //             setActualColumnPosition(newIndexColumn);
+        //         }
+        //         setHandleScrollStarted(false);
+    
+        //     }, 100); // Ajusta el tiempo según tus necesidades
+        
+        //     setScrollTimer(newScrollTimer); // Almacena el temporizador actual
+        // }
+    };
 
     return (
         <Grid bg="#fff" borderRadius="xl">
@@ -147,7 +207,7 @@ export function Orders () {
             <Text textTransform="uppercase" fontSize="lg" fontWeight="bold" color="black">Seguimiento de pedidos</Text>
           </Flex>
           <Divider orientation='horizontal'/>
-          <Flex overflow="auto">
+          <Flex overflow="auto" onScroll={handleScroll}>
             { ordersIsLoading &&
                 <Stack p="4" width="100%">
                     <Skeleton height='20px'/>
@@ -155,8 +215,8 @@ export function Orders () {
                     <Skeleton height='20px'/>
                 </Stack>
             }
-            {!ordersIsLoading && Object.entries(ordersData).map(([key, typeOrder]) => (
-                <Grid minWidth={ !isMobile ? "33%" : null} key={key} borderRadius="xl" p="4" alignContent="start">
+            {!ordersIsLoading && Object.entries(ordersData).map(([key, typeOrder], indexColumn) => (
+                <Grid ref={columnRefs[indexColumn]} minWidth={ !isMobile ? "33%" : null} key={key} borderRadius="xl" p="4" alignContent="start">
                     <Flex alignItems="center" justifyContent="space-between">
                         <Tag
                             size={"lg"}
@@ -172,7 +232,7 @@ export function Orders () {
                         { typeOrder.list && typeOrder.list.length > 0 &&
                             <Droppable droppableId={typeOrder.name}>
                                 {(provided, snapshot) => (
-                                    <Grid mt={2} minWidth="250px" {...provided.droppableProps} ref={provided.innerRef}>
+                                    <Grid className="columnOrder" mt={2} minWidth="250px" {...provided.droppableProps} ref={provided.innerRef}>
                                         {typeOrder.list.map((order, index) => (
                                             <Draggable key={order.id} draggableId={order.id.toString()} index={index}>
                                                 {provided => (
@@ -265,136 +325,136 @@ export function Orders () {
                 </Grid>
             ))}
           </Flex>
-          <Modal isOpen={isOpen} size={"2xl"} onClose={handleClose}>
+          <Modal scrollBehavior={"inside"} isOpen={isOpen} size={"2xl"} onClose={handleClose}>
             <ModalOverlay />
             <ModalContent>
             <ModalHeader>Modal de Pedido</ModalHeader>
             <ModalCloseButton />
-            <ModalBody>
-            <Tabs colorScheme='primary'>
-                <TabList overflowX="auto" overflowY="hidden">
-                    { orderDetails.isNew != true && <Tab border="0">Detalles</Tab>}
-                    { orderDetails.isNew != true && <Tab border="0">Seguimiento</Tab> }
-                </TabList>
-                { !isMobile && <TabIndicator mt="-1.5px" height="2px" bg="primary.500" borderRadius="1px"/>}
-                <TabPanels>
-                    <TabPanel>
-                        <Stack direction="row" spacing={3} mb={3}>
-                            <FormControl flex={1} mb={3}>
-                                <FormLabel>Nombre de Pedido</FormLabel>
-                                <Input variant="filled" value={orderDetails.name} name="name" onChange={handleChangeOrderDetails} placeholder="Ingrese el nombre del pedido" />
-                            </FormControl>
-                            <FormControl flex={0.6}>
-                                <FormLabel>Fecha de Vencimiento</FormLabel>
-                                <Input variant="filled" type="date" />
-                            </FormControl>
-                        </Stack>
+            <ModalBody pl={["1", "6"]} pr={["1", "6"]}>
+                <Tabs colorScheme='primary'>
+                    <TabList overflowX="auto" overflowY="hidden">
+                        { orderDetails.isNew != true && <Tab border="0">Detalles</Tab>}
+                        { orderDetails.isNew != true && <Tab border="0">Seguimiento</Tab> }
+                    </TabList>
+                    { !isMobile && <TabIndicator mt="-1.5px" height="2px" bg="primary.500" borderRadius="1px"/>}
+                    <TabPanels>
+                        <TabPanel>
+                            <Stack direction={{ base: "column", md: "row" }} spacing={3} mb={3}>
+                                <FormControl flex={1} mb={3}>
+                                    <FormLabel>Nombre de Pedido</FormLabel>
+                                    <Input variant="filled" value={orderDetails.name} name="name" onChange={handleChangeOrderDetails} placeholder="Ingrese el nombre del pedido" />
+                                </FormControl>
+                                <FormControl flex={0.6}>
+                                    <FormLabel>Fecha de Vencimiento</FormLabel>
+                                    <Input variant="filled" type="date" />
+                                </FormControl>
+                            </Stack>
 
-                        <Stack direction="row" spacing={3} mb={3}>
-                            <FormControl flex={1}>
-                                <FormLabel>Producto</FormLabel>
-                                <Select variant="filled" placeholder="Selecciona">
-                                    <option>Producto 1</option>
-                                    <option>Producto 2</option>
-                                    <option>Producto 3</option>
-                                </Select>
-                            </FormControl>
+                            <Stack direction={{ base: "column", md: "row" }} spacing={3} mb={3}>
+                                <FormControl flex={1}>
+                                    <FormLabel>Producto</FormLabel>
+                                    <Select variant="filled" placeholder="Selecciona">
+                                        <option>Producto 1</option>
+                                        <option>Producto 2</option>
+                                        <option>Producto 3</option>
+                                    </Select>
+                                </FormControl>
 
-                            <FormControl flex={0.3}>
-                                <FormLabel>Cantidad</FormLabel>
-                                <NumberInput variant="filled">
-                                <NumberInputField />
-                                </NumberInput>
-                            </FormControl>
-                        </Stack>
-                
-                        <Accordion allowToggle mt={5}>
-                            <AccordionItem>
-                                <AccordionButton>
-                                    <Box as="span" flex='1' textAlign='left'>
-                                        <Text fontSize="lg" fontWeight="light">
-                                            Opciones avanzadas
-                                        </Text>
-                                    </Box>
-                                    <AccordionIcon />
-                                </AccordionButton>
-                                <AccordionPanel pb={4}>
-                                    <Stack direction="row" spacing={3} mb={3}>
-                                        <FormControl flex={1}>
-                                            <FormLabel>Proveedor</FormLabel>
-                                            <Select variant="filled" placeholder="Selecciona">
-                                                <option>Proveedor 1</option>
-                                                <option>Proveedor 2</option>
-                                                <option>Proveedor 3</option>
-                                            </Select>
-                                        </FormControl>
-                                        <FormControl flex={1}>
-                                            <FormLabel>Tipo de Envío</FormLabel>
-                                            <Select variant="filled" placeholder="Selecciona">
-                                                <option>Barco</option>
-                                                <option>Avión</option>
-                                                <option>Tren</option>
-                                                <option>Camión</option>
-                                            </Select>
-                                        </FormControl>
-                                    </Stack>
-
-                                    <Stack direction="row" spacing={3} mb={3}>
-                                        <FormControl flex={1}>
-                                            <FormLabel>Estado</FormLabel>
-                                            <Select variant="filled" placeholder="Selecciona">
-                                                <option>En producción</option>
-                                                <option>En tránsito</option>
-                                                <option>Entregado</option>
-                                            </Select>
-                                        </FormControl>
-                                    </Stack>
-
-                                    <FormControl mb={3}>
-                                        <FormLabel>Pagos</FormLabel>
-                                        <Stack spacing={2}>
-                                            { orderDetails.payments && orderDetails.payments.map((payment, index) => (
-                                                <Stack direction="row">
-                                                    <Input variant="filled" placeholder="Pago" value={payment.value} name="value" onChange={(e) => handleChangeOrderDetails(e, 'payment', index)} />
-                                                    <Input variant="filled" placeholder="Porcentaje" name="percent" value={payment.percent} onChange={(e) => handleChangeOrderDetails(e, 'payment', index)} />
-                                                </Stack>
-                                            ))}
+                                <FormControl flex={0.3}>
+                                    <FormLabel>Cantidad</FormLabel>
+                                    <NumberInput variant="filled">
+                                    <NumberInputField />
+                                    </NumberInput>
+                                </FormControl>
+                            </Stack>
+                    
+                            <Accordion allowToggle mt={5}>
+                                <AccordionItem>
+                                    <AccordionButton>
+                                        <Box as="span" flex='1' textAlign='left'>
+                                            <Text fontSize="lg" fontWeight="light">
+                                                Opciones avanzadas
+                                            </Text>
+                                        </Box>
+                                        <AccordionIcon />
+                                    </AccordionButton>
+                                    <AccordionPanel pb={4}>
+                                        <Stack direction={{ base: "column", md: "row" }} spacing={3} mb={3}>
+                                            <FormControl flex={1}>
+                                                <FormLabel>Proveedor</FormLabel>
+                                                <Select variant="filled" placeholder="Selecciona">
+                                                    <option>Proveedor 1</option>
+                                                    <option>Proveedor 2</option>
+                                                    <option>Proveedor 3</option>
+                                                </Select>
+                                            </FormControl>
+                                            <FormControl flex={1}>
+                                                <FormLabel>Tipo de Envío</FormLabel>
+                                                <Select variant="filled" placeholder="Selecciona">
+                                                    <option>Barco</option>
+                                                    <option>Avión</option>
+                                                    <option>Tren</option>
+                                                    <option>Camión</option>
+                                                </Select>
+                                            </FormControl>
                                         </Stack>
-                                        <Button colorScheme="blue" mt={2} onClick={addPayment}>
-                                            <BiPlus /> Añadir pago
-                                        </Button>
-                                    </FormControl>
-                                </AccordionPanel>
-                            </AccordionItem>
-                        </Accordion>
-                    </TabPanel>
-                    <TabPanel>
-                    <Stepper index={activeStep} orientation='vertical' height='400px' gap='0'>
-                        {steps.map((step, index) => (
-                            <Step key={index}>
-                            <StepIndicator>
-                                <StepStatus
-                                complete={<StepIcon />}
-                                incomplete={<StepNumber />}
-                                active={<StepNumber />}
-                                />
-                            </StepIndicator>
 
-                            <Box flexShrink='0'>
-                                <StepTitle>{step.title}</StepTitle>
-                                <StepDescription>{step.description}</StepDescription>
-                            </Box>
+                                        <Stack direction="row" spacing={3} mb={3}>
+                                            <FormControl flex={1}>
+                                                <FormLabel>Estado</FormLabel>
+                                                <Select variant="filled" placeholder="Selecciona">
+                                                    <option>En producción</option>
+                                                    <option>En tránsito</option>
+                                                    <option>Entregado</option>
+                                                </Select>
+                                            </FormControl>
+                                        </Stack>
 
-                            <StepSeparator />
-                            </Step>
-                        ))}
-                        </Stepper>
-                    </TabPanel>
-                </TabPanels>
-            </Tabs>
+                                        <FormControl mb={3}>
+                                            <FormLabel>Pagos</FormLabel>
+                                            <Stack spacing={2}>
+                                                { orderDetails.payments && orderDetails.payments.map((payment, index) => (
+                                                    <Stack direction="row">
+                                                        <Input variant="filled" placeholder="Pago" value={payment.value} name="value" onChange={(e) => handleChangeOrderDetails(e, 'payment', index)} />
+                                                        <Input variant="filled" placeholder="Porcentaje" name="percent" value={payment.percent} onChange={(e) => handleChangeOrderDetails(e, 'payment', index)} />
+                                                    </Stack>
+                                                ))}
+                                            </Stack>
+                                            <Button colorScheme="blue" mt={2} onClick={addPayment}>
+                                                <BiPlus /> Añadir pago
+                                            </Button>
+                                        </FormControl>
+                                    </AccordionPanel>
+                                </AccordionItem>
+                            </Accordion>
+                        </TabPanel>
+                        <TabPanel>
+                        <Stepper index={activeStep} orientation='vertical' height='400px' gap='0'>
+                            {steps.map((step, index) => (
+                                <Step key={index}>
+                                <StepIndicator>
+                                    <StepStatus
+                                    complete={<StepIcon />}
+                                    incomplete={<StepNumber />}
+                                    active={<StepNumber />}
+                                    />
+                                </StepIndicator>
+
+                                <Box flexShrink='0'>
+                                    <StepTitle>{step.title}</StepTitle>
+                                    <StepDescription>{step.description}</StepDescription>
+                                </Box>
+
+                                <StepSeparator />
+                                </Step>
+                            ))}
+                            </Stepper>
+                        </TabPanel>
+                    </TabPanels>
+                </Tabs>
                 
             </ModalBody>
-            <ModalFooter>
+            <ModalFooter pl={["1", "6"]} pr={["1", "6"]}>
                 <Button colorScheme="blue" mr={3} onClick={handleClose}>
                 Guardar
                 </Button>

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { BrowserRouter as Router, Link, useLocation } from 'react-router-dom';
-import { Grid, Image, Box, Flex, Icon, Text, Spacer, Divider, IconButton, Tooltip, Fade, useBreakpointValue } from '@chakra-ui/react';
+import { Slide, Grid, Image, Box, Flex, Icon, Text, Spacer, Divider, IconButton, Tooltip, Fade, useBreakpointValue } from '@chakra-ui/react';
 import { BiMenu, BiHomeAlt, BiBuildings, BiCube, BiCalendarEvent, BiLogOut, BiRightArrowAlt, BiLeftArrowAlt, BiExtension, BiIdCard, BiChat } from "react-icons/bi";
 import AmazonLogo from "../../assets/images/logo_amazon.png";
 import AmazonLogoXs from "../../assets/images/logo_amazon_xs.png";
@@ -41,7 +41,7 @@ export function Sidebar ({ onLogout, isSidebarOpen, setSidebarOpen, handleSideba
             } else if (!isSidebarOpen && !isMobile) {
                 return "70px";
             } else if (isSidebarOpen && isMobile) {
-                return "100vw";
+                return "fit-content";
             } else if (!isSidebarOpen && isMobile) {
                 return "0px";
             }
@@ -52,9 +52,9 @@ export function Sidebar ({ onLogout, isSidebarOpen, setSidebarOpen, handleSideba
 
     return (
         <>
-            <Box id="sidebar" bg="#fff" color="secondary" height="100vh" display={(isMobile && !isSidebarOpen) ? "none" : "block"} width={getWidthSidebar()} p="4" boxShadow='xl' overflow="hidden" transition="width 0.3s ease" position="relative">
+            <Box zIndex="9" id="sidebar" bg="#fff" color="secondary" height={(isMobile && isSidebarOpen) ? "calc(100vh - 50px)" : "100vh"} display={(isMobile && !isSidebarOpen) ? "none" : "block"} width={getWidthSidebar()} p="4" boxShadow='xl' overflow="hidden" transition="width 0.3s ease" position={(isMobile && isSidebarOpen) ? "fixed" : "relative"}>
                 <Flex pos="sticky" direction="column" justify="space-between" h="100%">
-                { isSidebarOpen == true &&
+                { isSidebarOpen == true && !isMobile &&
                     <Box position="absolute" top="0" right="0" p="4" zIndex="1">
                         <IconButton
                             icon={isSidebarOpen ? <BiLeftArrowAlt /> : <BiRightArrowAlt />}
@@ -95,7 +95,7 @@ export function Sidebar ({ onLogout, isSidebarOpen, setSidebarOpen, handleSideba
                     <Box key={menuName.name}>
                         { isSidebarOpen == true &&
                         <Fade in={isSidebarOpen}>
-                            <Box fontSize="lg" fontWeight="bold" mt="5" mb="2" color="black" textTransform="uppercase">
+                            <Box fontSize={["md","lg"]} fontWeight="bold" mt="5" mb="2" color="black" textTransform="uppercase">
                             {menuName.name}
                             </Box>
                         </Fade>
@@ -103,7 +103,7 @@ export function Sidebar ({ onLogout, isSidebarOpen, setSidebarOpen, handleSideba
                         {menuName.list.map(menu => (
                             <Link to={menu.link} onClick={() => { isMobile ? handleSidebarToggle() : null }} key={menu.link} w="100%">
                                 <Tooltip label={menu.name} isDisabled={isSidebarOpen ? true : false} placement='right' hasArrow arrowSize={10}>
-                                <Flex alignItems="center" justifyContent="start" p="2" rounded="md" fontSize={isSidebarOpen ? "lg" : "2xl"} bg={isMenuActive(menu.link) ? "primary.500" : ""} color={isMenuActive(menu.link) ? "#fff" : ""} fontWeight="normal">
+                                <Flex alignItems="center" justifyContent="start" p="2" rounded="md" fontSize={isMobile ? "sm" : isSidebarOpen ? "lg" : "2xl"} bg={isMenuActive(menu.link) ? "primary.500" : ""} color={isMenuActive(menu.link) ? "#fff" : ""} fontWeight="normal">
                                     <Icon as={menu.icon} fontWeight="normal" mr={1} /> {isSidebarOpen ? menu.name : ""}
                                 </Flex>
                                 </Tooltip>
@@ -115,7 +115,7 @@ export function Sidebar ({ onLogout, isSidebarOpen, setSidebarOpen, handleSideba
                 <Box>
                     <Divider orientation='horizontal'/>
                     <Link onClick={onLogout} w="100%">
-                        <Flex alignItems="center" justifyContent="start" p="2" rounded="md" fontSize={isSidebarOpen ? "lg" : "2xl"} fontWeight="normal">
+                        <Flex alignItems="center" justifyContent="start" p="2" rounded="md" fontSize={isMobile ? "sm" : isSidebarOpen ? "lg" : "2xl"} fontWeight="normal">
                             <Icon as={BiLogOut} fontWeight="normal" mr={1} /> {isSidebarOpen ? "Logout" : ""}
                         </Flex>
                     </Link>

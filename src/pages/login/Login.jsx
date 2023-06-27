@@ -27,7 +27,7 @@ export function Login ({ setIsLogged }) {
                 <Heading color="primary.500">Bienvenido</Heading>
                 <Box minW={{ base: "90%", md: "468px" }}>
                     <form onSubmit={onLogin}>
-                        <Stack spacing={4} p="2rem" backgroundColor="whiteAlpha.900" boxShadow="md" borderRadius="xl">
+                        <Stack spacing={4} p="2rem" backgroundColor="whiteAlpha.900" boxShadow={["none", "md"]} borderRadius="xl">
                             <FormControl>
                                 <InputGroup>
                                     <InputLeftElement pointerEvents="none" children={<CFaUserAlt color="gray.300" />} />

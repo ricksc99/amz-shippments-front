@@ -123,13 +123,13 @@ export function ProductDetails ({ isOpen, fetchProducts, productDetails, setProd
 
     return (
         <>
-          <Modal isOpen={isOpen} size={"2xl"} onClose={handleClose}>
+          <Modal scrollBehavior={"inside"} isOpen={isOpen} size={"2xl"} onClose={handleClose}>
             <ModalOverlay />
             <ModalContent>
             <ModalHeader>Producto</ModalHeader>
             <ModalCloseButton />
             { !modalIsLoading && <>
-              <ModalBody>
+              <ModalBody pl={["1", "6"]} pr={["1", "6"]}>
                 <Tabs colorScheme='primary'>
                     <TabList overflowX="auto" overflowY="hidden">
                         <Tab fontSize={['xs', 'md']} border="0">Detalles</Tab>
@@ -176,7 +176,7 @@ export function ProductDetails ({ isOpen, fetchProducts, productDetails, setProd
                                     <Input type="number" variant="filled" value={productDetails.selling_price} name="selling_price" onChange={handleChangeProductDetails} placeholder="Ingrese el precio del producto" />
                                 </FormControl>
                             </Stack>
-                            <Stack direction="row" spacing={3} mb={3}>
+                            <Stack direction={{ base: "column", md: "row" }} spacing={3} mb={3}>
                                 <FormControl isRequired flex={1} mb={3}>
                                     <FormLabel>Proveedor</FormLabel>
                                     <Select 
@@ -196,7 +196,7 @@ export function ProductDetails ({ isOpen, fetchProducts, productDetails, setProd
                                     <Input type="number" borderColor={invalidFields.includes('quantity') ? 'red' : null} variant="filled" value={productDetails.quantity} name="quantity" onChange={handleChangeProductDetails} placeholder="Ingrese la cantidad en stock" />
                                 </FormControl>
                             </Stack>
-                            <Stack direction="row" spacing={3} mb={3}>
+                            <Stack direction={{ base: "column", md: "row" }} spacing={3} mb={3}>
                                 <FormControl isRequired flex={1} mb={3}>
                                     <FormLabel>ASIN</FormLabel>
                                     <Input borderColor={invalidFields.includes('asin') ? 'red' : null} variant="filled" value={productDetails.asin} name="asin" onChange={handleChangeProductDetails} placeholder="Ingrese el ASIN del producto" />
@@ -220,10 +220,14 @@ export function ProductDetails ({ isOpen, fetchProducts, productDetails, setProd
                 </Tabs>
                   
               </ModalBody>
-              <ModalFooter alignItems="center" justifyContent="space-between">
+              <ModalFooter pl={["1", "6"]} pr={["1", "6"]} alignItems="center" justifyContent="space-between">
                 <Flex alignItems="center" justifyContent="center" cursor="pointer" textDecor="underline" onClick={() => removeProduct(false)}>
-                  <Icon as={BsTrash3} mr={1}/>
-                  <Text>Eliminar</Text>
+                  { productDetails.id &&
+                    <>
+                      <Icon as={BsTrash3} mr={1}/>
+                      <Text>Eliminar</Text>
+                    </>
+                  }
                 </Flex>
                 <Flex alignItems="center" justifyContent="center">
                   { loadSave && <Grid width="100%" alignItems="center" justifyContent="center"><Spinner thickness='4px' speed='0.65s' emptyColor='gray.200' color='primary.500' size='lg' mr={2}/></Grid>}

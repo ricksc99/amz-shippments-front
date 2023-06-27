@@ -78,13 +78,13 @@ export function SupplierDetails ({ isOpen, fetchSuppliers, supplierDetails, setS
 
     return (
         <>
-          <Modal isOpen={isOpen} size={"2xl"} onClose={handleClose}>
+          <Modal scrollBehavior={"inside"} isOpen={isOpen} size={"2xl"} onClose={handleClose}>
             <ModalOverlay />
             <ModalContent>
             <ModalHeader>Proveedor</ModalHeader>
             <ModalCloseButton />
             { !modalIsLoading && <>
-              <ModalBody>
+              <ModalBody pl={["1", "6"]} pr={["1", "6"]}>
                 <Tabs colorScheme='primary'>
                     <TabList overflowX="auto" overflowY="hidden">
                         <Tab fontSize={['xs', 'md']} border="0">Detalles</Tab>
@@ -144,10 +144,14 @@ export function SupplierDetails ({ isOpen, fetchSuppliers, supplierDetails, setS
                 </Tabs>
                   
               </ModalBody>
-              <ModalFooter alignItems="center" justifyContent="space-between">
+              <ModalFooter pl={["1", "6"]} pr={["1", "6"]} alignItems="center" justifyContent="space-between">
                 <Flex alignItems="center" justifyContent="center" cursor="pointer" textDecor="underline" onClick={() => removeSupplier(false)}>
-                  <Icon as={BsTrash3} mr={1}/>
-                  <Text>Eliminar</Text>
+                  { supplierDetails.id &&
+                    <>
+                      <Icon as={BsTrash3} mr={1}/>
+                      <Text>Eliminar</Text>
+                    </>
+                  }
                 </Flex>
                 <Flex alignItems="center" justifyContent="center">
                   { loadSave && <Grid width="100%" alignItems="center" justifyContent="center"><Spinner thickness='4px' speed='0.65s' emptyColor='gray.200' color='primary.500' size='lg' mr={2}/></Grid>}

@@ -61,13 +61,6 @@ const theme = extendTheme({
         },
       },
     },
-    Select: {
-      styles: {
-        control: {
-          fontSize: ["xs", "md"],
-        },
-      },
-    },
     FormLabel: {
       baseStyle: {
         fontSize: ["xs", "md"],
