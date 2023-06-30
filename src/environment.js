@@ -1,2 +1,2 @@
-const API_URL = "http://165.232.41.116";
+const API_URL = "https://amz-shipments-api-dev.digitalizate.agency";
 export default API_URL;
